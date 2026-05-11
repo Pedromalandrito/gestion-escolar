@@ -11,12 +11,18 @@ router = APIRouter()
 
 @router.post("/asignaturas")
 def crear_asignatura(session: sessionDep, asignatura_data: asis.AsignaturaCreate):
+    if not asignatura_data.codigo or asignatura_data.codigo.strip() == "":
+        raise HTTPException(status_code=400, detail="El campo Codigo no puede estar Vacío")
     if not asignatura_data.nombre or asignatura_data.nombre.strip() == "":
         raise HTTPException(status_code=400, detail="El campo Nombre no puede estar Vacío")
     if not asignatura_data.descripcion or asignatura_data.descripcion.strip() == "":
         raise HTTPException(status_code=400, detail="El campo Descripcion no puede estar vacio")
     if not asignatura_data.carga_horaria or asignatura_data.carga_horaria <= 0:
         raise HTTPException(status_code=400, detail="El campo Carga Horaria debe ser mayor a 0")
+    
+    existe_codigo = session.exec(select(Asignatura).where(Asignatura.codigo == asignatura_data.codigo)).first()
+    if existe_codigo:
+        raise HTTPException(status_code=400, detail=f"La asignatura con codigo {asignatura_data.codigo} ya existe")
     
     existe_asignatura = session.exec(select(Asignatura).where(Asignatura.nombre == asignatura_data.nombre)).first()
     if existe_asignatura:
@@ -27,6 +33,7 @@ def crear_asignatura(session: sessionDep, asignatura_data: asis.AsignaturaCreate
         raise HTTPException(status_code=404, detail=f"No existe el docente con id {asignatura_data.docente_id}")
     
     new_asignatura = Asignatura(
+        codigo=asignatura_data.codigo,
         nombre=asignatura_data.nombre,
         descripcion=asignatura_data.descripcion,
         carga_horaria=asignatura_data.carga_horaria,
@@ -57,6 +64,8 @@ def actualizar_asignatura(session: sessionDep, asignatura_data: asis.AsignaturaU
     if not asignatura:
         raise HTTPException(status_code=404, detail=f"No existe la asignatura con id {asignatura_id}")
     
+    if not asignatura_data.codigo or asignatura_data.codigo.strip() == "":
+        raise HTTPException(status_code=400, detail="El campo Codigo no puede estar Vacío")
     if not asignatura_data.nombre or asignatura_data.nombre.strip() == "":
         raise HTTPException(status_code=400, detail="El campo Nombre no puede estar Vacío")
     if not asignatura_data.descripcion or asignatura_data.descripcion.strip() == "":
@@ -67,6 +76,12 @@ def actualizar_asignatura(session: sessionDep, asignatura_data: asis.AsignaturaU
     docente = session.exec(select(Docente).where(Docente.id == asignatura_data.docente_id, Docente.is_active == True)).first()
     if not docente:
         raise HTTPException(status_code=404, detail=f"No existe el docente con id {asignatura_data.docente_id}")
+    
+    if asignatura_data.codigo != asignatura.codigo:
+        existe_codigo = session.exec(select(Asignatura).where(Asignatura.codigo == asignatura_data.codigo)).first()
+        if existe_codigo:
+            raise HTTPException(status_code=400, detail=f"El codigo {asignatura_data.codigo} ya está en uso")
+        asignatura.codigo = asignatura_data.codigo
     
     if asignatura_data.nombre != asignatura.nombre:
         existe = session.exec(select(Asignatura).where(Asignatura.nombre == asignatura_data.nombre)).first()
@@ -88,6 +103,15 @@ def actualizar_asignatura_parcial(session: sessionDep, asignatura_data: asis.Asi
 
     if not asignatura:
         raise HTTPException(status_code=404, detail=f"No existe la asignatura con id {asignatura_id}")
+
+    if asignatura_data.codigo is not None:
+        if asignatura_data.codigo.strip() == "":
+            raise HTTPException(status_code=400, detail="El campo Codigo no puede estar Vacío")
+        if asignatura_data.codigo != asignatura.codigo:
+            existe_codigo = session.exec(select(Asignatura).where(Asignatura.codigo == asignatura_data.codigo)).first()
+            if existe_codigo:
+                raise HTTPException(status_code=400, detail=f"El codigo {asignatura_data.codigo} ya está en uso")
+            asignatura.codigo = asignatura_data.codigo
 
     if asignatura_data.nombre is not None:
         if asignatura_data.nombre.strip() == "":

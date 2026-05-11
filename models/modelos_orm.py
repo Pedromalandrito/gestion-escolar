@@ -5,7 +5,7 @@ from typing import List
 
 class intermediariaAsignaturas(SQLModel, table=True):
     id_seccion: int = Field(foreign_key="seccion.id", primary_key=True)
-    id_asignatura : int = Field(foreign_key="asignatura.id", primary_key=True)
+    id_asignatura: int = Field(foreign_key="asignatura.id", primary_key=True)
 
 class EstadoAcademico(str, Enum):
     APROBADO = "Aprobado"
@@ -35,54 +35,54 @@ class estados_secciones(str, Enum):
     INACTIVO = "Inactivo"
 
 class turno_seccion(str, Enum):
-    MORNING ="Mañana"
+    MORNING = "Mañana"
     TARDE = "Tarde"
     NOCHE = "Noche"
     FINES_DE_SEMANA = "Fines de semana"
 
 class Docente(SQLModel, table=True):
-    id : int = Field(default=None, primary_key=True )
+    id: int = Field(default=None, primary_key=True)
     nombre: str
     documento: str = Field(unique=True)
     especialidad: Especialidades
-    correo : str = Field(unique=True)
+    correo: str = Field(unique=True)
     telefono: str
     condicion_laboral: condiciones_laborales = Field(default="Activo")
     is_active: bool = Field(default=True)
 
-    asignaturas : List["Asignatura"] = Relationship(back_populates="docente")
+    asignaturas: List["Asignatura"] = Relationship(back_populates="docente")
 
 class Curso(SQLModel, table=True):
-    id : int = Field(default=None, primary_key=True)
-    nombre : str
-    descripcion : str
-    estado : bool = Field(default=True)
+    id: int = Field(default=None, primary_key=True)
+    nombre: str
+    descripcion: str
+    estado: bool = Field(default=True)
 
-    secciones : List["Seccion"] = Relationship(back_populates="curso")
+    secciones: List["Seccion"] = Relationship(back_populates="curso")
 
 class Asignatura(SQLModel, table=True):
-    id : int = Field(default=None, primary_key=True)
-    nombre : str
-    descripcion : str
-    carga_horaria : int
-    estado : bool = Field(default=True)
-    docente_id : int = Field(foreign_key="docente.id")
+    id: int = Field(default=None, primary_key=True)
+    codigo: str = Field(unique=True)
+    nombre: str
+    descripcion: str
+    carga_horaria: int
+    estado: bool = Field(default=True)
+    docente_id: int = Field(foreign_key="docente.id")
 
-    docente : Docente | None = Relationship(back_populates="asignaturas")
-    secciones : List["Seccion"] = Relationship(back_populates="asignaturas", link_model=intermediariaAsignaturas)
+    docente: Docente | None = Relationship(back_populates="asignaturas")
+    secciones: List["Seccion"] = Relationship(back_populates="asignaturas", link_model=intermediariaAsignaturas)
 
 class Seccion(SQLModel, table=True):
-    id : int = Field(default=None, primary_key=True)
+    id: int = Field(default=None, primary_key=True)
     turno: turno_seccion
-    aula : str
-    cupo : int = Field(default=0)
-    estado : estados_secciones
+    aula: str
+    cupo: int = Field(default=0)
+    estado: estados_secciones
+    curso_id: int = Field(foreign_key="curso.id")    
 
-    curso_id : int = Field(foreign_key="curso.id")    
-
-    curso : Curso | None = Relationship(back_populates="secciones")
-    estudiantes : List["Estudiante"] = Relationship(back_populates="seccion")
-    asignaturas : List["Asignatura"] = Relationship(back_populates="secciones", link_model=intermediariaAsignaturas)
+    curso: Curso | None = Relationship(back_populates="secciones")
+    estudiantes: List["Estudiante"] = Relationship(back_populates="seccion")
+    asignaturas: List["Asignatura"] = Relationship(back_populates="secciones", link_model=intermediariaAsignaturas)
 
 class PeriodoAcademico(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -94,14 +94,18 @@ class PeriodoAcademico(SQLModel, table=True):
     estudiantes: List["Estudiante"] = Relationship(back_populates="periodoacademico")
 
 class Estudiante(SQLModel, table=True):
-    numero_control : int = Field(default=None, primary_key=True)
-    correo : str
-    telefono : str
+    numero_control: int = Field(default=None, primary_key=True)
+    nombre: str
+    apellido: str
+    documento: str = Field(unique=True)
+    correo: str
+    telefono: str
+    fecha_nacimiento: datetime | None = None
     fecha_ingreso: datetime = Field(default_factory=datetime.now)
     estado_academico: EstadoAcademico
-    seccion_id : int = Field(foreign_key="seccion.id")
+    seccion_id: int = Field(foreign_key="seccion.id")
     is_active: bool = Field(default=True)
     periodo_academico_id: int | None = Field(foreign_key="periodoacademico.id")
 
     periodoacademico: PeriodoAcademico | None = Relationship(back_populates="estudiantes")
-    seccion : Seccion | None = Relationship(back_populates= "estudiantes")
+    seccion: Seccion | None = Relationship(back_populates="estudiantes")

@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class AsignaturaCreate(BaseModel):
+    codigo: str
     nombre: str
     descripcion: str
     carga_horaria: int
@@ -8,6 +9,7 @@ class AsignaturaCreate(BaseModel):
 
 class AsignaturaRead(BaseModel):
     id: int
+    codigo: str
     nombre: str
     descripcion: str
     carga_horaria: int
@@ -15,12 +17,14 @@ class AsignaturaRead(BaseModel):
     docente_id: int
 
 class AsignaturaUpdate(BaseModel):
+    codigo: str
     nombre: str
     descripcion: str
     carga_horaria: int
     docente_id: int
 
 class AsignaturaUpdatePartial(BaseModel):
+    codigo: str | None
     nombre: str | None
     descripcion: str | None
     carga_horaria: int | None

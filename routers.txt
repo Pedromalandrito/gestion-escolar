@@ -138,7 +138,7 @@ def delete_asignatura(session: sessionDep, asignatura_id: int, eliminacion: bool
         session.refresh(asignatura)
         return {"message": f"Asignatura con id {asignatura_id} eliminada de forma Logica"}
 
-        from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from models.modelos_orm import Curso
 from database.connection import get_session
@@ -250,7 +250,6 @@ def delete_curso(session: sessionDep, curso_id: int, eliminacion: bool = True):
         session.commit()
         session.refresh(curso)
         return {"message": f"Curso con id {curso_id} eliminado de forma Logica"}
-
 
         from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
@@ -411,7 +410,7 @@ def delete_docente(session: sessionDep, documento: str, eliminacion: bool = True
         session.refresh(docente)
         return {"message": f"Docente con documento {documento} eliminado de forma Logica"}
 
-        from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from models.modelos_orm import Estudiante, Seccion, PeriodoAcademico
 from database.connection import get_session
@@ -519,6 +518,9 @@ def actualizar_estudiante_parcial(session: sessionDep, estudiante_data: es.Estud
     
     if estudiante_data.estado_academico is not None:
         estudiante.estado_academico = estudiante_data.estado_academico
+    
+    if estudiante_data.periodo_academico_id is not None:
+        estudiante.periodo_academico_id = estudiante_data.periodo_academico_id
     
     if estudiante_data.seccion_id is not None:
         seccion = session.get(Seccion, estudiante_data.seccion_id)
@@ -683,8 +685,7 @@ def delete_periodo_academico(session: sessionDep, periodo_id: int, eliminacion: 
         session.refresh(periodo)
         return {"message": f"Periodo academico con id {periodo_id} eliminado de forma Logica"}
 
-
-        from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from models.modelos_orm import intermediariaAsignaturas, Seccion, Asignatura
 from database.connection import get_session

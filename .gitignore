@@ -1,0 +1,7 @@
+venv
+__pycache__
+database.txt
+models.txt
+requirements.txt
+routers.txt
+schemas.txt
