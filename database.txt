@@ -1,0 +1,11 @@
+connection.py:
+from sqlmodel import Session, create_engine
+db_url = "postgresql://postgres:postgres@localhost:5432/gestion_escolar"
+
+engine = create_engine(db_url, echo=True)
+
+def get_session():
+    with Session(engine) as session:
+        print("Conexión a la base de datos establecida")
+        yield session
+        print("Cerrando la conexión a la base de datos")
