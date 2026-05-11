@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from fastapi import FastAPI, APIRouter
 from sqlmodel import SQLModel
 from database.connection import engine
@@ -11,12 +10,11 @@ from routers.secciones_router import router as sr
 from routers.periodo_academico_router import router as par
 from routers.seccion_asignatura_router import router as sar
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    SQLModel.metadata.create_all(engine)
-    yield
+app = FastAPI(title="API escolar")
 
-app = FastAPI(lifespan=lifespan)
+@app.on_event("startup")
+def on_startup():
+    SQLModel.metadata.create_all(engine)
 
 routers: dict[str, APIRouter] = {
     "Endpoints Estudiantes": er,
